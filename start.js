@@ -16,8 +16,9 @@ const hasDevArg = args.includes("--dev") || args.includes("-d");
 const isDev = hasDevArg;
 const canChangeKeys = process.env.CAN_CHANGE_KEYS !== "false";
 
-const fastapiPort = 8000;
-const nextjsPort = 3000;
+const fastapiPort = process.env.PORT_API ? parseInt(process.env.PORT_API, 10) : 8000;
+const nextjsPort = process.env.PORT ? parseInt(process.env.PORT, 10) : 3000;
+const nextjsHost = process.env.HOST || "0.0.0.0";
 const appmcpPort = 8001;
 
 const userConfigPath = join(process.env.APP_DATA_DIRECTORY, "userConfig.json");
@@ -143,7 +144,7 @@ const startServers = async () => {
       isDev ? "dev" : "start",
       "--",
       "-H",
-      "127.0.0.1",
+      nextjsHost,
       "-p",
       nextjsPort.toString(),
     ],

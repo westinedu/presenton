@@ -5,11 +5,13 @@ services:
       context: .
       dockerfile: Dockerfile
     ports:
-      # You can replace 5000 with any other port number of your choice to run Presenton on a different port number.
-      - "5000:80"
+      # Map host 6000 to container 3000 (Next.js default). Change 6000 if needed.
+      - "6000:3000"
     volumes:
       - ./app_data:/app_data
     environment:
+      - HOST=0.0.0.0
+      - PORT=3000
       - CAN_CHANGE_KEYS=${CAN_CHANGE_KEYS}
       - LLM=${LLM}
       - OPENAI_API_KEY=${OPENAI_API_KEY}
@@ -44,11 +46,13 @@ services:
               count: 1
               capabilities: [gpu]
     ports:
-      # You can replace 5000 with any other port number of your choice to run Presenton on a different port number.
-      - "5000:80"
+      # GPU variant; adjust host port if 6000 is taken.
+      - "6000:3000"
     volumes:
       - ./app_data:/app_data
     environment:
+      - HOST=0.0.0.0
+      - PORT=3000
       - CAN_CHANGE_KEYS=${CAN_CHANGE_KEYS}
       - LLM=${LLM}
       - OPENAI_API_KEY=${OPENAI_API_KEY}
@@ -75,11 +79,13 @@ services:
       context: .
       dockerfile: Dockerfile.dev
     ports:
-      - "5000:80"
+      - "6000:3000"
     volumes:
       - .:/app
       - ./app_data:/app_data
     environment:
+      - HOST=0.0.0.0
+      - PORT=3000
       - CAN_CHANGE_KEYS=${CAN_CHANGE_KEYS}
       - LLM=${LLM}
       - OPENAI_API_KEY=${OPENAI_API_KEY}
@@ -113,11 +119,13 @@ services:
               count: 1
               capabilities: [gpu]
     ports:
-      - "5000:80"
+      - "6000:3000"
     volumes:
       - .:/app
       - ./app_data:/app_data
     environment:
+      - HOST=0.0.0.0
+      - PORT=3000
       - CAN_CHANGE_KEYS=${CAN_CHANGE_KEYS}
       - LLM=${LLM}
       - OPENAI_API_KEY=${OPENAI_API_KEY}

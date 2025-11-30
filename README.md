@@ -63,20 +63,25 @@ Presenton gives you complete control over your AI presentation workflow. Choose 
 ##### Linux/MacOS (Bash/Zsh Shell):
 
 ```bash
-docker run -it --name presenton -p 5000:80 -v "./app_data:/app_data" ghcr.io/presenton/presenton:latest
+docker run -it --name presenton \
+  -e HOST=0.0.0.0 -e PORT=3000 -e PORT_API=8000 \
+  -p 3000:3000 \
+  -p 3001:8000 \
+  -v "./app_data:/app_data" \
+  ghcr.io/presenton/presenton:latest
 ```
 
 ##### Windows (PowerShell):
 
 ```bash
-docker run -it --name presenton -p 5000:80 -v "${PWD}\app_data:/app_data" ghcr.io/presenton/presenton:latest
+docker run -it --name presenton -p 3000:3000 -p 3001:8000 -v "${PWD}\app_data:/app_data" ghcr.io/presenton/presenton:latest
 ```
 
 #### 2. Open Presenton
 
-Open http://localhost:5000 on browser of your choice to use Presenton.
+Open http://localhost:3000 on browser of your choice to use Presenton.
 
-> **Note: You can replace 5000 with any other port number of your choice to run Presenton on a different port number.**
+> **Note:** 3000 是安全端口，避免浏览器对 6000/5000 报 ERR_UNSAFE_PORT；如需改端口，保持主机端口与容器 3000 对应。
 
 ## Deployment Configurations
 
@@ -275,3 +280,28 @@ For detailed info checkout [API documentation](https://docs.presenton.ai/using-p
 ## License
 
 Apache 2.0
+
+
+原因：你运行的是官方镜像，它的 start.js 把 Next.js 绑定在 127.0.0.1 (line 3000)，宿主虽然映射了 3000:3000，但容器内只监听 loopback，外部访问被拒绝。我们本地改了 start.js 但没有重建镜像，环境变量也无法覆盖旧脚本里的 -H 127.0.0.1。
+
+解决方案（推荐重建本地镜像）：
+
+cd /Volumes/ZHITAI/AI-courses/presenton
+
+# 重建使用当前代码的镜像
+docker build -t presenton-local .
+
+# 运行（可后台加 -d）
+docker rm -f presenton 2>/dev/null
+docker run -it --name presenton \
+  -e HOST=0.0.0.0 -e PORT=3000 -e PORT_API=8000 \
+  -p 3000:3000 -p 3001:8000 \
+  -v "$PWD/app_data:/app_data" \
+  presenton-local
+然后访问 http://localhost:3000。
+
+若用 compose：
+
+docker compose down
+docker compose up --build production   # 如需后台加 -d
+# 访问 http://localhost:3000
